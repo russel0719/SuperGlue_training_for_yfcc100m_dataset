@@ -100,7 +100,7 @@ def sample_descriptors(keypoints, descriptors, s: int = 8):
 def warp_keypoints(keypoints, homography_mat):
     source = torch.cat([keypoints, torch.ones(len(keypoints), 1).to(keypoints.device)], dim=-1)
     dest = (homography_mat @ source.T).T
-    dest /= dest[:, 2:3]
+    dest /= dest[:, 2:3].clone()
     return dest[:, :2]
 
 class SuperPoint(nn.Module):
@@ -272,7 +272,7 @@ class SuperPoint(nn.Module):
             without checking any conditions with respect to preexisting keypoints.
             """
             if len(k) < self.config['max_keypoints']:
-                print("Rare condition executed")
+                # print("Rare condition executed")
                 to_add_points = self.config['max_keypoints'] - len(k)
                 random_keypoints = torch.stack([torch.randint(0, w*8, (to_add_points,), dtype=torch.float32, device=k.device), torch.randint(0, h*8, (to_add_points,), dtype=torch.float32, device=k.device)], 1)
                 keypoints[i] = torch.cat([keypoints[i], random_keypoints], dim=0)

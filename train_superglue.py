@@ -17,8 +17,7 @@ from models.superpoint import SuperPoint
 from models.superglue import SuperGlue
 from utils.common import increment_path, init_seeds, clean_checkpoint, reduce_tensor, download_base_files, debug_image_plot, time_synchronized, test_model, ModelEMA
 from utils.preprocess_utils import torch_find_matches
-from utils.dataset import COCO_loader, COCO_valloader, collate_batch
-from torch.utils.tensorboard import SummaryWriter
+from utils.dataset import IMGloader, collate_batch
 
 def change_lr(epoch, config, optimizer):
     if epoch >= config['optimizer_params']['step_epoch']:
@@ -88,7 +87,7 @@ def train(config, rank):
                 ema.updates = restore_dict['ema_updates']
     if is_distributed:
         superglue_model = DDP(superglue_model, device_ids=[rank], output_device=rank)
-    train_dataset = COCO_loader(config['dataset_params'], typ="train")
+    train_dataset = IMGloader(config['dataset_params'], mode="train")
     sampler = torch.utils.data.distributed.DistributedSampler(train_dataset, shuffle=True) if is_distributed else None
     train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=config['train_params']['batch_size'],
                                             num_workers=config['train_params']['num_workers'],
@@ -98,7 +97,7 @@ def train(config, rank):
                                             pin_memory=True)
     num_batches = len(train_dataloader)
     if rank in [-1, 0]:
-        val_dataset = COCO_valloader(config['dataset_params'])
+        val_dataset = IMGloader(config['dataset_params'], mode="val")
         val_dataloader = torch.utils.data.DataLoader(val_dataset, batch_size=1,
                                             num_workers=0,
                                             sampler=None,
@@ -198,7 +197,7 @@ def train(config, rank):
                     eval_superglue = ema.ema
                 else:
                     eval_superglue = superglue_model.module if is_distributed else superglue_model
-                results = test_model(val_dataloader, superpoint_model, eval_superglue, config['train_params']['val_images_count'], device)
+                results = test_model(val_dataloader, superpoint_model, eval_superglue, config['train_params']['val_images_count'], save_dir, device)
             ckpt = {'epoch': epoch,
                     'iter': -1,
                     'ema': ema.ema.state_dict() if ema else None,

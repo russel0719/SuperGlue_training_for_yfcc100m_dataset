@@ -11,6 +11,9 @@ dump_homo_pairs/
 dump_match_pairs/
 *.pt
 *.pth
+!superglue_indoor.pth
+!superglue_outdoor.pth
+!superpoint_v1.pth
 assets/coco_test_images/
 assets/indoor_test_images/
 assets/outdoor_test_images/

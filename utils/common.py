@@ -53,6 +53,7 @@ import torch
 import math
 import matplotlib.pyplot as plt
 import matplotlib
+import matplotlib.cm as cm
 from pathlib import Path
 import os
 import glob
@@ -744,7 +745,7 @@ def find_pred(inp, superpoint_model, superglue_model):
     pred = {**pred, **superglue_model(data)}
     return pred
 
-def test_model(test_loader, superpoint_model, superglue_model,val_count, device, min_matches=12):
+def test_model(test_loader, superpoint_model, superglue_model,val_count, save_dir, device, min_matches=12):
     superpoint_model.eval()
     superglue_model.eval()
     all_recall, all_precision, all_error_dlt, all_error_ransac = [], [], [], []
@@ -762,6 +763,9 @@ def test_model(test_loader, superpoint_model, superglue_model,val_count, device,
         mkpts0 = kpts0[valid]
         mkpts1 = kpts1[matches[valid]]
         mconf = conf[valid]
+        make_matching_plot_fast(
+            orig_image[0, 0].cpu().numpy() * 255, warped_image[0, 0].cpu().numpy() * 255, kpts0, kpts1, mkpts0, mkpts1, cm.jet(mconf),
+            [], save_dir / '{}_matches.png'.format(str(i_no+1)), False, 10, False, 'matches', [])
         if len(mconf) < min_matches:
             all_precision.append(0)
             all_recall.append(0)

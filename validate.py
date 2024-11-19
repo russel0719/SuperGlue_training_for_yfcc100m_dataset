@@ -39,7 +39,7 @@ if __name__ == '__main__':
             'keypoint_encoder': [32, 64, 128, 256],
             'GNN_layers': ['self', 'cross'] * 9,
             'sinkhorn_iterations': 20,
-            'match_threshold': 0.2,
+            'match_threshold': 0.5,
             'use_layernorm': False
         }
     }
@@ -49,8 +49,8 @@ if __name__ == '__main__':
 
     superpoint = SuperPoint(config=configs['superpoint']).to(device)
     superglue = SuperGlue(config=configs['superglue']).to(device)
-    superpoint.load_state_dict(torch.load('/workspace/SuperGlue_training/models/weights/superpoint_v1.pth'))
-    superglue.load_state_dict(torch.load('/workspace/SuperGlue_training/output/train3/default/weights/best.pt')['model'])
+    superpoint.load_state_dict(torch.load('/workspace/SuperGlue_training_for_yfcc100m_dataset/models/weights/superpoint_v1.pth'))
+    superglue.load_state_dict(torch.load('/workspace/SuperGlue_training_for_yfcc100m_dataset/output/train4/default/weights/best.pt')['model'])
     superpoint.eval()
     superglue.eval()
 

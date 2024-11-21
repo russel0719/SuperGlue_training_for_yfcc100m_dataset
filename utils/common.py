@@ -723,7 +723,7 @@ def error_colormap(x):
         np.stack([2-x*2, x*2, np.zeros_like(x), np.ones_like(x)], -1), 0, 1)
 
 def weighted_score(results):
-    weight = [0.0, 0.1, 0.2, 0.1, 0.2, 0.2, 0.1, 0.1]
+    weight = [0.0, 0.0, 0.1, 0.0, 0.0, 0.1, 0.4, 0.4]
     values = [results['dlt_auc'][0], results['dlt_auc'][1], results['dlt_auc'][2], results['ransac_auc'][0],
               results['ransac_auc'][1], results['ransac_auc'][2], results['precision'], results['recall']]
     weight_score = (np.array(weight) * np.array(values)).sum()
